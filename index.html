@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindEase - Stress Check-in</title>
+
+  <style>
+    :root {
+      --primary: #5865f2;
+      --primary-dark: #3f49c9;
+      --background: #f4f7fb;
+      --card: #ffffff;
+      --text: #202938;
+      --muted: #687386;
+      --border: #dfe5ee;
+      --success: #198754;
+      --warning: #d97706;
+      --danger: #c0392b;
+      --shadow: 0 12px 35px rgba(31, 42, 68, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eef2ff, var(--background));
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(920px, 92%);
+      margin: 0 auto;
+      padding: 28px 0 50px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: var(--primary);
+      color: white;
+      font-size: 29px;
+      margin-bottom: 10px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.25;
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+
+    h2 {
+      font-size: 1.55rem;
+    }
+
+    p {
+      margin-top: 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: clamp(22px, 5vw, 42px);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .notice {
+      padding: 16px;
+      border-radius: 13px;
+      background: #f0f4ff;
+      border-left: 4px solid var(--primary);
+      color: #334155;
+      margin: 20px 0;
+    }
+
+    .notice.warning {
+      background: #fff7ed;
+      border-left-color: var(--warning);
+    }
+
+    .notice.danger {
+      background: #fff1f2;
+      border-left-color: var(--danger);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 13px 22px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .primary-button {
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary-button:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    .secondary-button {
+      background: #e9edf5;
+      color: var(--text);
+    }
+
+    .danger-button {
+      background: var(--danger);
+      color: white;
+    }
+
+    .small-text {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .progress-area {
+      margin-bottom: 26px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      height: 10px;
+      background: #e8edf5;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    .question-number {
+      color: var(--primary);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .question-text {
+      font-size: clamp(1.25rem, 3vw, 1.7rem);
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .answer-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .answer-option {
+      position: relative;
+    }
+
+    .answer-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .answer-option label {
+      display: block;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 15px 18px;
+      cursor: pointer;
+      color: var(--text);
+      background: white;
+      transition: 0.2s ease;
+    }
+
+    .answer-option label:hover {
+      border-color: var(--primary);
+      background: #f8f9ff;
+    }
+
+    .answer-option input:checked + label {
+      border-color: var(--primary);
+      background: #eef0ff;
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .answer-option input:focus-visible + label {
+      outline: 3px solid rgba(88, 101, 242, 0.35);
+    }
+
+    .score-box {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #f5f7ff;
+      margin: 20px 0;
+    }
+
+    .score-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      color: white;
+      background: var(--primary);
+      font-size: 1.55rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .level-title {
+      margin-bottom: 5px;
+      color: var(--primary-dark);
+    }
+
+    .action-list,
+    .pattern-list {
+      display: grid;
+      gap: 13px;
+      padding: 0;
+      margin: 14px 0 0;
+      list-style: none;
+    }
+
+    .action-list li,
+    .pattern-list li {
+      position: relative;
+      padding: 14px 16px 14px 42px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #edf0f5;
+    }
+
+    .action-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 16px;
+      color: var(--success);
+      font-weight: 800;
+    }
+
+    .pattern-list li::before {
+      content: "•";
+      position: absolute;
+      left: 19px;
+      color: var(--primary);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .resource-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .resource-buttons a {
+      display: inline-block;
+      text-decoration: none;
+      border-radius: 11px;
+      padding: 12px 17px;
+      font-weight: 700;
+    }
+
+    .call-button {
+      background: var(--danger);
+      color: white;
+    }
+
+    .emergency-button {
+      background: #222;
+      color: white;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .container {
+        width: 94%;
+        padding-top: 18px;
+      }
+
+      .card {
+        border-radius: 17px;
+        padding: 22px 17px;
+      }
+
+      .score-box {
+        align-items: flex-start;
+      }
+
+      .score-number {
+        width: 75px;
+        height: 75px;
+        font-size: 1.2rem;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .resource-buttons a {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <header>
+      <div class="logo" aria-hidden="true">🧠</div>
+      <h1>MindEase</h1>
+      <p class="subtitle">A simple stress check-in and action guide</p>
+    </header>
+
+    <!-- Welcome Screen -->
+    <section id="welcomeScreen" class="screen active card">
+      <h2>How are you feeling recently?</h2>
+
+      <p>
+        This short check-in can help you understand your current stress
+        patterns and choose a few practical actions.
+      </p>
+
+      <div class="notice">
+        <strong>Important:</strong> This is a self-reflection tool, not a
+        medical diagnosis. If stress is seriously affecting your life, speak
+        with a qualified mental-health professional.
+      </div>
+
+      <p class="small-text">
+        Your answers are processed in this browser and are not sent to a
+        server by this webpage.
+      </p>
+
+      <div class="button-row">
+        <button class="primary-button" id="startButton">
+          Start Check-in
+        </button>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="quizScreen" class="screen card">
+      <div class="progress-area">
+        <div class="progress-label">
+          <span id="progressText">Question 1 of 8</span>
+          <span id="progressPercent">13%</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="question-number" id="questionNumber">
+        Question 1
+      </div>
+
+      <div class="question-text" id="questionText"></div>
+
+      <div class="answer-options" id="answerOptions"></div>
+
+      <div class="button-row">
+        <button class="secondary-button" id="previousButton">
+          Previous
+        </button>
+
+        <button class="primary-button" id="nextButton" disabled>
+          Next
+        </button>
+      </div>
+    </section>
+
+    <!-- Safety Screen -->
+    <section id="safetyScreen" class="screen card">
+      <h2>One final safety question</h2>
+
+      <div class="notice warning">
+        This answer does not affect your stress score. It only helps us show
+        the right kind of support.
+      </div>
+
+      <p class="question-text">
+        Are you feeling unsafe right now or thinking about hurting yourself?
+      </p>
+
+      <div class="answer-options">
+        <div class="answer-option">
+          <input type="radio" name="safety" id="safetyNo" value="no" />
+          <label for="safetyNo">No, I feel safe right now</label>
+        </div>
+
+        <div class="answer-option">
+          <input type="radio" name="safety" id="safetyYes" value="yes" />
+          <label for="safetyYes">Yes, I need immediate support</label>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button class="secondary-button" id="safetyBackButton">
+          Back
+        </button>
+
+        <button class="primary-button" id="seeResultsButton" disabled>
+          See My Results
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="resultsScreen" class="screen card">
+      <h2>Your check-in result</h2>
+
+      <div class="score-box">
+        <div class="score-number" id="scoreNumber">0/32</div>
+
+        <div>
+          <h3 class="level-title" id="levelTitle">Current stress level</h3>
+          <p id="levelDescription"></p>
+        </div>
+      </div>
+
+      <div id="crisisBox" class="notice danger" style="display: none;">
+        <h3> please get support now</h3>
+        <p>
+          You deserve immediate support. If you may act on thoughts of
+          self-harm or are in immediate danger, contact emergency services or
+          go to the nearest hospital. Do not stay alone—tell a trusted person
+          and ask them to stay with you.
+        </p>
+
+        <div class="resource-buttons">
+          <a class="call-button" href="tel:14416">
+            Call Tele-MANAS: 14416
+          </a>
+
+          <a class="emergency-button" href="tel:112">
+            Call Emergency Services: 112
+          </a>
+        </div>
+      </div>
+
+      <div id="normalResults">
+        <h3>Your main stress patterns</h3>
+        <ul class="pattern-list" id="patternList"></ul>
+
+        <h3 style="margin-top: 28px;">Recommended actions</h3>
+        <ul class="action-list" id="actionList"></ul>
+
+        <div class="notice" style="margin-top: 24px;">
+          Try these actions for the next seven days. Choose one small action
+          instead of trying to change everything at once.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button class="primary-button" id="restartButton">
+          Take Check-in Again
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      MindEase is an educational self-reflection tool and does not replace
+      professional care.
+    </footer>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        text: "Have you felt overwhelmed by your responsibilities?",
+        pattern: "Feeling overwhelmed",
+        advice:
+          "Write down everything on your mind and choose only one small task to complete first."
+      },
+      {
+        text: "Have you found it difficult to relax or calm your mind?",
+        pattern: "Difficulty relaxing",
+        advice:
+          "Practise slow breathing for five minutes: inhale for 4 seconds and exhale for 6 seconds."
+      },
+      {
+        text: "Have you been worrying repeatedly about the past or future?",
+        pattern: "Repeated worrying",
+        advice:
+          "Use a 10–15 minute daily worry period. Write the worry down and postpone it until that time."
+      },
+      {
+        text: "Have you had trouble sleeping because of stress or overthinking?",
+        pattern: "Sleep disturbance",
+        advice:
+          "Create a quiet wind-down routine before bed and write down tomorrow's tasks before trying to sleep."
+      },
+      {
+        text: "Have you felt irritable, angry, or emotionally sensitive?",
+        pattern: "Emotional pressure",
+        advice:
+          "Pause before reacting, take several slow breaths, and explain your feeling calmly to someone you trust."
+      },
+      {
+        text: "Have you found it hard to concentrate on work, study, or conversations?",
+        pattern: "Concentration difficulty",
+        advice:
+          "Try one phone-free 20-minute focus session, followed by a short break."
+      },
+      {
+        text:
+          "Have you experienced stress-related symptoms such as headaches, tiredness, fast heartbeat, or stomach discomfort?",
+        pattern: "Physical stress symptoms",
+        advice:
+          "Take a gentle walk, drink water, relax your shoulders, and seek medical advice if symptoms are severe or persistent."
+      },
+      {
+        text:
+          "Has stress affected your daily activities, relationships, work, or studies?",
+        pattern: "Impact on daily life",
+        advice:
+          "Share what is happening with a trusted person and consider speaking with a psychologist or doctor."
+      }
+    ];
+
+    const answerLabels = [
+      "Never",
+      "Rarely",
+      "Sometimes",
+      "Often",
+      "Almost every day"
+    ];
+
+    let currentQuestion = 0;
+    let answers = new Array(questions.length).fill(null);
+    let safetyAnswer = null;
+
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const quizScreen = document.getElementById("quizScreen");
+    const safetyScreen = document.getElementById("safetyScreen");
+    const resultsScreen = document.getElementById("resultsScreen");
+
+    const startButton = document.getElementById("startButton");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+    const safetyBackButton = document.getElementById("safetyBackButton");
+    const seeResultsButton = document.getElementById("seeResultsButton");
+    const restartButton = document.getElementById("restartButton");
+
+    const progressText = document.getElementById("progressText");
+    const progressPercent = document.getElementById("progressPercent");
+    const progressBar = document.getElementById("progressBar");
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const answerOptions = document.getElementById("answerOptions");
+
+    function showScreen(screenToShow) {
+      [welcomeScreen, quizScreen, safetyScreen, resultsScreen].forEach(
+        (screen) => screen.classList.remove("active")
+      );
+
+      screenToShow.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+      const questionCount = questions.length;
+      const percent = Math.round(
+        ((currentQuestion + 1) / questionCount) * 100
+      );
+
+      progressText.textContent =
+        `Question ${currentQuestion + 1} of ${questionCount}`;
+
+      progressPercent.textContent = `${percent}%`;
+      progressBar.style.width = `${percent}%`;
+      questionNumber.textContent = `Question ${currentQuestion + 1}`;
+      questionText.textContent = question.text;
+
+      answerOptions.innerHTML = "";
+
+      answerLabels.forEach((labelText, value) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "answer-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "answer";
+        input.id = `answer-${value}`;
+        input.value = value;
+
+        if (answers[currentQuestion] === value) {
+          input.checked = true;
+        }
+
+        const label = document.createElement("label");
+        label.htmlFor = `answer-${value}`;
+        label.textContent = labelText;
+
+        input.addEventListener("change", () => {
+          answers[currentQuestion] = Number(input.value);
+          nextButton.disabled = false;
+        });
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        answerOptions.appendChild(wrapper);
+      });
+
+      previousButton.disabled = currentQuestion === 0;
+      nextButton.disabled = answers[currentQuestion] === null;
+
+      nextButton.textContent =
+        currentQuestion === questions.length - 1 ? "Continue" : "Next";
+    }
+
+    function getStressLevel(score) {
+      // These bands are for this educational prototype only.
+      if (score <= 8) {
+        return {
+          title: "Lower current stress",
+          description:
+            "Your answers suggest that stress is currently present but may be manageable. Continue using healthy routines and check in with yourself regularly.",
+          color: "#198754"
+        };
+      }
+
+      if (score <= 16) {
+        return {
+          title: "Moderate current stress",
+          description:
+            "Your answers suggest that stress may be affecting your thoughts or routines. A few consistent coping actions could help.",
+          color: "#d97706"
+        };
+      }
+
+      if (score <= 24) {
+        return {
+          title: "Higher current stress",
+          description:
+            "Your answers suggest that stress is significantly affecting your mental load. Focus on small actions and consider speaking with someone you trust.",
+          color: "#c2410c"
+        };
+      }
+
+      return {
+        title: "Very high current stress",
+        description:
+          "Your answers suggest a high level of current stress. Please prioritise support from a trusted person and consider contacting a mental-health professional.",
+        color: "#c0392b"
+      };
+    }
+
+    function getBaseActions(score) {
+      if (score <= 8) {
+        return [
+          "Keep a regular sleep and daily routine.",
+          "Take a short walk or do another enjoyable physical activity.",
+          "Continue talking openly with people you trust."
+        ];
+      }
+
+      if (score <= 16) {
+        return [
+          "Set aside 10–15 minutes as a daily worry period.",
+          "Break large tasks into one small next action.",
+          "Practise slow breathing for five minutes."
+        ];
+      }
+
+      if (score <= 24) {
+        return [
+          "Choose only one important task at a time and reduce distractions.",
+          "Write down worries instead of repeatedly analysing them.",
+          "Tell a trusted person that you have been feeling stressed."
+        ];
+      }
+
+      return [
+        "Ask a trusted person to check in with you today.",
+        "Arrange an appointment with a psychologist, counsellor, or doctor.",
+        "Reduce non-essential responsibilities temporarily and focus on basic care."
+      ];
+    }
+
+    function getTopPatterns() {
+      return questions
+        .map((question, index) => ({
+          label: question.pattern,
+          advice: question.advice,
+          value: answers[index]
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 3);
+    }
+
+    function displayResults() {
+      const score = answers.reduce((total, answer) => total + answer, 0);
+      const level = getStressLevel(score);
+      const topPatterns = getTopPatterns();
+
+      const scoreNumber = document.getElementById("scoreNumber");
+      const levelTitle = document.getElementById("levelTitle");
+      const levelDescription = document.getElementById("levelDescription");
+      const patternList = document.getElementById("patternList");
+      const actionList = document.getElementById("actionList");
+      const crisisBox = document.getElementById("crisisBox");
+      const normalResults = document.getElementById("normalResults");
+
+      scoreNumber.textContent = `${score}/32`;
+      scoreNumber.style.background = level.color;
+      levelTitle.textContent = level.title;
+      levelTitle.style.color = level.color;
+      levelDescription.textContent = level.description;
+
+      patternList.innerHTML = "";
+
+      topPatterns.forEach((pattern) => {
+        const item = document.createElement("li");
+        item.textContent = `${pattern.label} — ${pattern.advice}`;
+        patternList.appendChild(item);
+      });
+
+      actionList.innerHTML = "";
+
+      const actions = getBaseActions(score);
+
+      topPatterns.forEach((pattern) => {
+        if (pattern.value >= 3 && !actions.includes(pattern.advice)) {
+          actions.push(pattern.advice);
+        }
+      });
+
+      actions.slice(0, 5).forEach((action) => {
+        const item = document.createElement("li");
+        item.textContent = action;
+        actionList.appendChild(item);
+      });
+
+      if (safetyAnswer === "yes") {
+        crisisBox.style.display = "block";
+        normalResults.style.display = "none";
+      } else {
+        crisisBox.style.display = "none";
+        normalResults.style.display = "block";
+      }
+
+      showScreen(resultsScreen);
+    }
+
+    startButton.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = new Array(questions.length).fill(null);
+      safetyAnswer = null;
+      renderQuestion();
+      showScreen(quizScreen);
+    });
+
+    previousButton.addEventListener("click", () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (answers[currentQuestion] === null) return;
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showScreen(safetyScreen);
+      }
+    });
+
+    safetyBackButton.addEventListener("click", () => {
+      showScreen(quizScreen);
+    });
+
+    document.querySelectorAll('input[name="safety"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        safetyAnswer = input.value;
+        seeResultsButton.disabled = false;
+      });
+    });
+
+    seeResultsButton.addEventListener("click", () => {
+      displayResults();
+    });
+
+    restartButton.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = new Array(questions.length).fill(null);
+      safetyAnswer = null;
+
+      document.querySelectorAll('input[name="safety"]').forEach((input) => {
+        input.checked = false;
+      });
+
+      seeResultsButton.disabled = true;
+      renderQuestion();
+      showScreen(welcomeScreen);
+    });
+  </script>
+</body>
+</html>
