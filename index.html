@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111936" />
+
+  <title>MindEase 2.0 - Stress Check-in</title>
+
+  <style>
+    :root {
+      --bg-dark: #0d1228;
+      --bg-purple: #171d46;
+      --primary: #7c83ff;
+      --primary-light: #aeb3ff;
+      --cyan: #5eead4;
+      --pink: #f472b6;
+      --white: #ffffff;
+      --text: #edf0ff;
+      --muted: #aeb6d0;
+      --card: rgba(255, 255, 255, 0.1);
+      --card-border: rgba(255, 255, 255, 0.16);
+      --success: #55d98b;
+      --warning: #ffc46b;
+      --danger: #ff7676;
+      --shadow: 0 25px 70px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, #29316d 0, transparent 34%),
+        radial-gradient(circle at bottom right, #402448 0, transparent 31%),
+        linear-gradient(135deg, var(--bg-dark), var(--bg-purple));
+      overflow-x: hidden;
+    }
+
+    .background-orb {
+      position: fixed;
+      z-index: -1;
+      border-radius: 50%;
+      filter: blur(7px);
+      opacity: 0.45;
+      pointer-events: none;
+      animation: floatOrb 12s ease-in-out infinite alternate;
+    }
+
+    .orb-one {
+      width: 220px;
+      height: 220px;
+      top: 9%;
+      left: -80px;
+      background: var(--primary);
+    }
+
+    .orb-two {
+      width: 260px;
+      height: 260px;
+      right: -100px;
+      top: 42%;
+      background: var(--pink);
+      animation-delay: -4s;
+    }
+
+    .orb-three {
+      width: 180px;
+      height: 180px;
+      bottom: -70px;
+      left: 35%;
+      background: var(--cyan);
+      animation-delay: -7s;
+    }
+
+    @keyframes floatOrb {
+      from {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      to {
+        transform: translate3d(25px, -35px, 0) scale(1.12);
+      }
+    }
+
+    .app {
+      width: min(980px, 94%);
+      margin: auto;
+      padding: 28px 0 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 17px;
+      font-size: 24px;
+      background: linear-gradient(135deg, var(--primary), var(--pink));
+      box-shadow: 0 12px 30px rgba(124, 131, 255, 0.35);
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      50% {
+        box-shadow: 0 12px 36px rgba(244, 114, 182, 0.52);
+      }
+    }
+
+    .brand-name {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .privacy-pill {
+      padding: 8px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.07);
+      font-size: 0.78rem;
+    }
+
+    .screen {
+      display: none;
+      animation: screenIn 0.55s ease both;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes screenIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.985);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .glass-card {
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: clamp(24px, 5vw, 54px);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .hero {
+      position: relative;
+      min-height: 570px;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "✦";
+      position: absolute;
+      right: 8%;
+      top: 14%;
+      color: rgba(255, 255, 255, 0.36);
+      font-size: 2rem;
+      animation: twinkle 2.5s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      50% {
+        opacity: 0.25;
+        transform: rotate(25deg) scale(0.8);
+      }
+    }
+
+    .hero-content {
+      max-width: 670px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border: 1px solid rgba(174, 179, 255, 0.32);
+      border-radius: 999px;
+      color: var(--primary-light);
+      background: rgba(124, 131, 255, 0.12);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.18;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin: 22px 0 18px;
+      font-size: clamp(2.4rem, 7vw, 5.3rem);
+      letter-spacing: -3px;
+      background: linear-gradient(
+        120deg,
+        #ffffff,
+        #cdd1ff 45%,
+        #f7a6d4
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+    }
+
+    h3 {
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--muted);
+    }
+
+    .hero-description {
+      max-width: 640px;
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .feature-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 26px 0;
+    }
+
+    .feature-chip {
+      padding: 9px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 999px;
+      color: #dfe3ff;
+      background: rgba(255, 255, 255, 0.07);
+      font-size: 0.82rem;
+    }
+
+    .disclaimer {
+      padding: 15px 17px;
+      border-left: 3px solid var(--primary-light);
+      border-radius: 14px;
+      background: rgba(124, 131, 255, 0.12);
+      color: #d9ddff;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    button,
+    .video-button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 20px;
+      color: var(--white);
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    button:hover:not(:disabled),
+    .video-button:hover {
+      transform: translateY(-3px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .primary-button {
+      background: linear-gradient(135deg, var(--primary), #a36bff);
+      box-shadow: 0 12px 25px rgba(124, 131, 255, 0.28);
+    }
+
+    .primary-button:hover:not(:disabled) {
+      box-shadow: 0 16px 34px rgba(124, 131, 255, 0.45);
+    }
+
+    .secondary-button {
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .danger-button {
+      background: linear-gradient(135deg, #ef4444, #be3455);
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .question-count {
+      color: var(--primary-light);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--primary), var(--pink));
+      transition: width 0.5s ease;
+    }
+
+    .question-panel {
+      min-height: 370px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .question-panel.question-in {
+      animation: questionIn 0.45s ease both;
+    }
+
+    @keyframes questionIn {
+      from {
+        opacity: 0;
+        transform: translateX(25px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .question-kicker {
+      margin-bottom: 12px;
+      color: var(--cyan);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .question-title {
+      max-width: 730px;
+      margin-bottom: 28px;
+      font-size: clamp(1.65rem, 4vw, 2.65rem);
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .answer-option {
+      position: relative;
+    }
+
+    .answer-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .answer-option label {
+      display: grid;
+      min-height: 110px;
+      place-items: center;
+      align-content: center;
+      gap: 8px;
+      padding: 14px 10px;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.06);
+      text-align: center;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .answer-option label span {
+      color: var(--primary-light);
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+
+    .answer-option label small {
+      font-size: 0.77rem;
+      line-height: 1.25;
+    }
+
+    .answer-option label:hover {
+      border-color: var(--primary-light);
+      background: rgba(124, 131, 255, 0.17);
+      transform: translateY(-4px);
+    }
+
+    .answer-option input:checked + label {
+      border-color: var(--cyan);
+      color: white;
+      background: linear-gradient(
+        145deg,
+        rgba(94, 234, 212, 0.22),
+        rgba(124, 131, 255, 0.24)
+      );
+      box-shadow: 0 12px 28px rgba(94, 234, 212, 0.12);
+      transform: translateY(-5px);
+    }
+
+    .answer-option input:focus-visible + label {
+      outline: 3px solid rgba(94, 234, 212, 0.38);
+    }
+
+    .results-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .results-header h2 {
+      margin-bottom: 8px;
+    }
+
+    .result-hero {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      gap: 28px;
+      padding: 25px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .score-ring {
+      --score-degree: 0deg;
+      position: relative;
+      width: 170px;
+      height: 170px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--cyan) var(--score-degree),
+        rgba(255, 255, 255, 0.12) var(--score-degree)
+      );
+      animation: ringIn 1.2s ease both;
+    }
+
+    .score-ring::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: #1a2147;
+    }
+
+    .score-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .score-number {
+      display: block;
+      color: white;
+      font-size: 2.35rem;
+      font-weight: 900;
+    }
+
+    .score-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    @keyframes ringIn {
+      from {
+        opacity: 0;
+        transform: rotate(-80deg) scale(0.7);
+      }
+
+      to {
+        opacity: 1;
+        transform: rotate(0) scale(1);
+      }
+    }
+
+    .level-title {
+      margin-bottom: 8px;
+      color: var(--cyan);
+      font-size: 1.7rem;
+    }
+
+    .motivation {
+      position: relative;
+      margin: 25px 0;
+      padding: 23px 24px 23px 58px;
+      overflow: hidden;
+      border: 1px solid rgba(244, 114, 182, 0.28);
+      border-radius: 20px;
+      background: linear-gradient(
+        120deg,
+        rgba(244, 114, 182, 0.16),
+        rgba(124, 131, 255, 0.15)
+      );
+    }
+
+    .motivation::before {
+      content: "✦";
+      position: absolute;
+      left: 22px;
+      top: 22px;
+      color: var(--pink);
+      font-size: 1.5rem;
+    }
+
+    .motivation p {
+      margin: 0;
+      color: #f8e7f2;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.65;
+    }
+
+    .section-heading {
+      margin-top: 34px;
+      margin-bottom: 14px;
+    }
+
+    .pattern-list,
+    .action-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .pattern-list li,
+    .action-list li {
+      position: relative;
+      padding: 15px 16px 15px 45px;
+      border: 1px solid var(--card-border);
+      border-radius: 15px;
+      color: #dfe3ff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .pattern-list li::before {
+      content: "◈";
+      position: absolute;
+      left: 16px;
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .action-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 17px;
+      color: var(--success);
+      font-weight: 900;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .video-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 230px;
+      padding: 18px;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      transition: 0.25s ease;
+    }
+
+    .video-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(244, 114, 182, 0.55);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .video-icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff4f81, #ff253f);
+      font-size: 1.25rem;
+    }
+
+    .video-card h3 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .video-card p {
+      flex: 1;
+      margin-bottom: 15px;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .video-button {
+      display: inline-block;
+      padding: 10px 13px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    .safety-box {
+      padding: 21px;
+      border: 1px solid rgba(255, 118, 118, 0.35);
+      border-radius: 18px;
+      background: rgba(255, 118, 118, 0.12);
+    }
+
+    .safety-box h3 {
+      color: #ffaaaa;
+    }
+
+    .resource-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .resource-buttons a {
+      display: inline-block;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .tele-button {
+      background: #b83b70;
+    }
+
+    .emergency-button {
+      background: #9f2929;
+    }
+
+    .confetti-piece {
+      position: fixed;
+      z-index: 50;
+      top: -20px;
+      width: 9px;
+      height: 15px;
+      border-radius: 3px;
+      pointer-events: none;
+      animation: confettiFall 2.7s linear forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        opacity: 0;
+        transform: translateY(110vh) rotate(720deg);
+      }
+    }
+
+    footer {
+      padding-top: 22px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .answer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .answer-option:last-child {
+        grid-column: span 2;
+      }
+
+      .result-hero {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .score-ring {
+        margin: auto;
+      }
+
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .app {
+        width: 94%;
+        padding-top: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .privacy-pill {
+        display: none;
+      }
+
+      .glass-card {
+        border-radius: 22px;
+        padding: 22px 17px;
+      }
+
+      .hero {
+        min-height: 590px;
+      }
+
+      h1 {
+        letter-spacing: -1.8px;
+      }
+
+      .answer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .answer-option:last-child {
+        grid-column: auto;
+      }
+
+      button,
+      .video-button {
+        width: 100%;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background-orb orb-one"></div>
+  <div class="background-orb orb-two"></div>
+  <div class="background-orb orb-three"></div>
+
+  <main class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">🧠</div>
+
+        <div>
+          <p class="brand-name">MindEase</p>
+          <p class="brand-subtitle">Understand your mind. Take one small step.</p>
+        </div>
+      </div>
+
+      <div class="privacy-pill">🔒 Private in your browser</div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <section id="welcomeScreen" class="screen active glass-card hero">
+      <div class="hero-content">
+        <div class="eyebrow">✨ Two-minute self check-in</div>
+
+        <h1>Make space for a calmer mind.</h1>
+
+        <p class="hero-description">
+          Answer a few simple questions about your recent experience.
+          MindEase will show your stress patterns, practical actions,
+          motivation, and helpful videos.
+        </p>
+
+        <div class="feature-row">
+          <span class="feature-chip">⚡ Quick quiz</span>
+          <span class="feature-chip">🎯 Personalised actions</span>
+          <span class="feature-chip">🎬 Helpful videos</span>
+          <span class="feature-chip">🌱 Gentle guidance</span>
+        </div>
+
+        <div class="disclaimer">
+          <strong>Important:</strong> MindEase is a self-reflection tool,
+          not a medical diagnosis. If stress seriously affects your daily
+          life, speak with a qualified mental-health professional.
+        </div>
+
+        <div class="button-row">
+          <button id="startButton" class="primary-button">
+            Start My Check-in →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="quizScreen" class="screen glass-card">
+      <div class="quiz-header">
+        <span id="questionCount" class="question-count">
+          Question 1 of 8
+        </span>
+
+        <span id="progressPercent" class="question-count">
+          13%
+        </span>
+      </div>
+
+      <div class="progress-track">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <div id="questionPanel" class="question-panel">
+        <p id="questionKicker" class="question-kicker">
+          Recent experience
+        </p>
+
+        <h2 id="questionText" class="question-title"></h2>
+
+        <div id="answerOptions" class="answer-grid"></div>
+      </div>
+
+      <div class="button-row">
+        <button id="previousButton" class="secondary-button">
+          ← Back
+        </button>
+
+        <button id="nextButton" class="primary-button" disabled>
+          Next →
+        </button>
+      </div>
+    </section>
+
+    <!-- Safety Screen -->
+    <section id="safetyScreen" class="screen glass-card">
+      <div class="eyebrow">💙 One important question</div>
+
+      <h2>Are you feeling safe right now?</h2>
+
+      <p>
+        This answer does not change your score. It only helps us show the
+        right type of support.
+      </p>
+
+      <div class="answer-grid" style="margin-top: 24px;">
+        <div class="answer-option">
+          <input type="radio" name="safety" id="safetyNo" value="no" />
+          <label for="safetyNo">
+            <span>🙂</span>
+            <small>I feel safe</small>
+          </label>
+        </div>
+
+        <div class="answer-option">
+          <input type="radio" name="safety" id="safetyYes" value="yes" />
+          <label for="safetyYes">
+            <span>🆘</span>
+            <small>I need immediate support</small>
+          </label>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="safetyBackButton" class="secondary-button">
+          ← Back
+        </button>
+
+        <button id="seeResultsButton" class="primary-button" disabled>
+          Show My Results ✨
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="resultsScreen" class="screen glass-card">
+      <div class="results-header">
+        <div class="eyebrow">🌟 Your MindEase reflection</div>
+        <h2>Your results are ready</h2>
+        <p>Remember: this is guidance for reflection, not a diagnosis.</p>
+      </div>
+
+      <div class="result-hero">
+        <div id="scoreRing" class="score-ring">
+          <div class="score-content">
+            <span id="scoreNumber" class="score-number">0</span>
+            <span class="score-label">out of 32</span>
+          </div>
+        </div>
+
+        <div>
+          <h3 id="levelTitle" class="level-title">
+            Your current stress level
+          </h3>
+
+          <p id="levelDescription"></p>
+        </div>
+      </div>
+
+      <div id="motivationBox" class="motivation">
+        <p id="motivationText"></p>
+      </div>
+
+      <!-- Crisis Support -->
+      <div id="crisisBox" class="safety-box" style="display: none;">
+        <h3>Immediate support is important</h3>
+
+        <p>
+          Please do not stay alone. Tell a trusted person how you are feeling
+          and ask them to stay with you. If you may hurt yourself or are in
+          immediate danger, contact emergency support now.
+        </p>
+
+        <div class="resource-buttons">
+          <a class="tele-button" href="tel:14416">
+            Call Tele-MANAS: 14416
+          </a>
+
+          <a class="emergency-button" href="tel:112">
+            Emergency: 112
+          </a>
+        </div>
+      </div>
+
+      <div id="normalResults">
+        <h3 class="section-heading">Your main stress patterns</h3>
+        <ul id="patternList" class="pattern-list"></ul>
+
+        <h3 class="section-heading">Your personalised actions</h3>
+        <ul id="actionList" class="action-list"></ul>
+
+        <h3 class="section-heading">Videos you may find helpful</h3>
+        <p>
+          Choose one video that matches how you feel. You do not need to watch
+          all of them.
+        </p>
+
+        <div id="videoGrid" class="video-grid"></div>
+
+        <div class="disclaimer" style="margin-top: 25px;">
+          YouTube videos are external content. If any exercise makes you feel
+          uncomfortable, stop and choose another activity or speak with a
+          professional.
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="restartButton" class="primary-button">
+          Take Check-in Again
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      MindEase is an educational self-reflection tool and does not replace
+      professional care.
+    </footer>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        text: "Have you felt overwhelmed by your responsibilities?",
+        pattern: "Feeling overwhelmed",
+        advice:
+          "Write down everything on your mind and choose only one small task to complete first."
+      },
+      {
+        text: "Have you found it difficult to relax or calm your mind?",
+        pattern: "Difficulty relaxing",
+        advice:
+          "Try slow breathing for five minutes: inhale for 4 seconds and exhale for 6 seconds."
+      },
+      {
+        text: "Have you been worrying repeatedly about the past or future?",
+        pattern: "Repeated worrying",
+        advice:
+          "Use a 10–15 minute daily worry period. Write the worry down and return to it only during that period."
+      },
+      {
+        text: "Have you had trouble sleeping because of stress or overthinking?",
+        pattern: "Sleep disturbance",
+        advice:
+          "Create a calm wind-down routine and write down tomorrow's tasks before going to bed."
+      },
+      {
+        text: "Have you felt irritable, angry, or emotionally sensitive?",
+        pattern: "Emotional pressure",
+        advice:
+          "Pause before reacting, take a few slow breaths, and explain your feelings calmly."
+      },
+      {
+        text: "Have you found it hard to concentrate on work, study, or conversations?",
+        pattern: "Concentration difficulty",
+        advice:
+          "Try one phone-free 20-minute focus session, followed by a short break."
+      },
+      {
+        text:
+          "Have you experienced stress-related symptoms such as headaches, tiredness, fast heartbeat, or stomach discomfort?",
+        pattern: "Physical stress symptoms",
+        advice:
+          "Take a gentle walk, drink water, relax your shoulders, and seek medical advice if symptoms persist."
+      },
+      {
+        text:
+          "Has stress affected your daily activities, relationships, work, or studies?",
+        pattern: "Impact on daily life",
+        advice:
+          "Speak with someone you trust and consider talking with a psychologist, counsellor, or doctor."
+      }
+    ];
+
+    const answerLabels = [
+      "Never",
+      "Rarely",
+      "Sometimes",
+      "Often",
+      "Almost every day"
+    ];
+
+    const videos = [
+      {
+        id: "iYO48Q1Rn38",
+        title: "Guided Mindfulness for Anxiety",
+        description:
+          "A 16-minute guided practice using breathing and gentle noting for racing thoughts.",
+        match: [1, 2, 5]
+      },
+      {
+        id: "lS0kcSNlULw",
+        title: "10-Minute Meditation for Stress",
+        description:
+          "A short meditation focused on noticing stressful thoughts and reframing them.",
+        match: [0, 1, 2, 4]
+      },
+      {
+        id: "EfubAj5f_rM",
+        title: "Grounding for Anxious Thoughts",
+        description:
+          "A grounding exercise that helps bring attention away from overthinking and back to the present.",
+        match: [1, 2, 5, 6]
+      }
+    ];
+
+    const motivationLines = {
+      lower: [
+        "You are doing better than you think. Keep protecting your peace through small daily habits.",
+        "A calm mind is built one small choice at a time. Today is a good day to begin.",
+        "You do not need to change everything. Keep the habits that help you feel steady."
+      ],
+      moderate: [
+        "You are not weak for feeling stressed. You are human, and small steps can create real change.",
+        "Your thoughts may be loud, but they do not control your next action.",
+        "You do not need a perfect day. One peaceful moment is enough to start."
+      ],
+      high: [
+        "You are carrying a lot, but you do not have to carry it alone. Asking for support is strength.",
+        "Progress can be very small: one breath, one task, one honest conversation.",
+        "Your current stress is a signal that you deserve care—not a reason to blame yourself."
+      ],
+      veryHigh: [
+        "You matter more than your problems. Please reach out to a trusted person and allow them to support you.",
+        "You do not have to solve everything today. Focus on safety, support, and the next small step.",
+        "Getting help is not failure. It is a brave and practical way to protect your wellbeing."
+      ]
+    };
+
+    let currentQuestion = 0;
+    let answers = new Array(questions.length).fill(null);
+    let safetyAnswer = null;
+
+    const screens = {
+      welcome: document.getElementById("welcomeScreen"),
+      quiz: document.getElementById("quizScreen"),
+      safety: document.getElementById("safetyScreen"),
+      results: document.getElementById("resultsScreen")
+    };
+
+    const startButton = document.getElementById("startButton");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+    const safetyBackButton = document.getElementById("safetyBackButton");
+    const seeResultsButton = document.getElementById("seeResultsButton");
+    const restartButton = document.getElementById("restartButton");
+
+    const questionCount = document.getElementById("questionCount");
+    const progressPercent = document.getElementById("progressPercent");
+    const progressBar = document.getElementById("progressBar");
+    const questionPanel = document.getElementById("questionPanel");
+    const questionKicker = document.getElementById("questionKicker");
+    const questionText = document.getElementById("questionText");
+    const answerOptions = document.getElementById("answerOptions");
+
+    function showScreen(screen) {
+      Object.values(screens).forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      screen.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderQuestion() {
+      const question = questions[currentQuestion];
+      const percent = Math.round(
+        ((currentQuestion + 1) / questions.length) * 100
+      );
+
+      questionCount.textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+      progressPercent.textContent = `${percent}%`;
+      progressBar.style.width = `${percent}%`;
+
+      questionKicker.textContent =
+        currentQuestion < 3
+          ? "Your recent thoughts"
+          : currentQuestion < 6
+          ? "Your recent feelings"
+          : "Your recent wellbeing";
+
+      questionText.textContent = question.text;
+      answerOptions.innerHTML = "";
+
+      answerLabels.forEach((labelText, value) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "answer-option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "stressAnswer";
+        input.id = `stressAnswer-${value}`;
+        input.value = value;
+
+        if (answers[currentQuestion] === value) {
+          input.checked = true;
+        }
+
+        const label = document.createElement("label");
+        label.htmlFor = input.id;
+        label.innerHTML = `
+          <span>${value}</span>
+          <small>${labelText}</small>
+        `;
+
+        input.addEventListener("change", () => {
+          answers[currentQuestion] = Number(input.value);
+          nextButton.disabled = false;
+        });
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(label);
+        answerOptions.appendChild(wrapper);
+      });
+
+      previousButton.disabled = currentQuestion === 0;
+      nextButton.disabled = answers[currentQuestion] === null;
+
+      nextButton.textContent =
+        currentQuestion === questions.length - 1
+          ? "Continue to Safety →"
+          : "Next →";
+
+      questionPanel.classList.remove("question-in");
+      void questionPanel.offsetWidth;
+      questionPanel.classList.add("question-in");
+    }
+
+    function getLevel(score) {
+      if (score <= 8) {
+        return {
+          type: "lower",
+          title: "Lower current stress",
+          color: "#55d98b",
+          description:
+            "Stress appears to be present but may currently be manageable. Continue protecting your routines and emotional balance."
+        };
+      }
+
+      if (score <= 16) {
+        return {
+          type: "moderate",
+          title: "Moderate current stress",
+          color: "#ffc46b",
+          description:
+            "Stress may be affecting some thoughts or routines. Consistent small actions can help you feel more in control."
+        };
+      }
+
+      if (score <= 24) {
+        return {
+          type: "high",
+          title: "Higher current stress",
+          color: "#ff9c62",
+          description:
+            "Your answers suggest that stress is creating a significant mental load. Prioritise support and one small action at a time."
+        };
+      }
+
+      return {
+        type: "veryHigh",
+        title: "Very high current stress",
+        color: "#ff7676",
+        description:
+          "Your answers suggest a high current level of stress. Please prioritise support from a trusted person and consider professional help."
+      };
+    }
+
+    function getBaseActions(score) {
+      if (score <= 8) {
+        return [
+          "Keep a regular sleep and daily routine.",
+          "Take a short walk or do another enjoyable physical activity.",
+          "Continue connecting with people who help you feel calm."
+        ];
+      }
+
+      if (score <= 16) {
+        return [
+          "Set aside 10–15 minutes as a daily worry period.",
+          "Break large tasks into one small next action.",
+          "Practise slow breathing for five minutes."
+        ];
+      }
+
+      if (score <= 24) {
+        return [
+          "Choose one important task at a time and reduce distractions.",
+          "Write down worries instead of repeatedly analysing them.",
+          "Tell a trusted person that you have been feeling stressed."
+        ];
+      }
+
+      return [
+        "Ask a trusted person to check in with you today.",
+        "Consider arranging an appointment with a psychologist, counsellor, or doctor.",
+        "Temporarily reduce non-essential responsibilities and focus on basic care."
+      ];
+    }
+
+    function getTopPatterns() {
+      return questions
+        .map((question, index) => ({
+          label: question.pattern,
+          advice: question.advice,
+          value: answers[index],
+          index
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 3);
+    }
+
+    function getRecommendedVideos(topPatterns) {
+      const topIndexes = topPatterns.map((item) => item.index);
+
+      const matched = videos.filter((video) =>
+        video.match.some((index) => topIndexes.includes(index))
+      );
+
+      const remaining = videos.filter((video) => !matched.includes(video));
+
+      return [...matched, ...remaining].slice(0, 3);
+    }
+
+    function renderVideos(topPatterns) {
+      const videoGrid = document.getElementById("videoGrid");
+      const recommendedVideos = getRecommendedVideos(topPatterns);
+
+      videoGrid.innerHTML = "";
+
+      recommendedVideos.forEach((video) => {
+        const card = document.createElement("article");
+        card.className = "video-card";
+
+        card.innerHTML = `
+          <div class="video-icon">▶</div>
+          <h3>${video.title}</h3>
+          <p>${video.description}</p>
+          <a
+            class="video-button"
+            href="https://www.youtube.com/watch?v=${video.id}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Watch on YouTube →
+          </a>
+        `;
+
+        videoGrid.appendChild(card);
+      });
+    }
+
+    function createConfetti() {
+      const colors = ["#5eead4", "#7c83ff", "#f472b6", "#ffc46b", "#ffffff"];
+
+      for (let i = 0; i < 45; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDelay = `${Math.random() * 0.7}s`;
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        document.body.appendChild(piece);
+
+        setTimeout(() => {
+          piece.remove();
+        }, 3500);
+      }
+    }
+
+    function displayResults() {
+      const score = answers.reduce((total, answer) => total + answer, 0);
+      const level = getLevel(score);
+      const topPatterns = getTopPatterns();
+
+      const scoreRing = document.getElementById("scoreRing");
+      const scoreNumber = document.getElementById("scoreNumber");
+      const levelTitle = document.getElementById("levelTitle");
+      const levelDescription = document.getElementById("levelDescription");
+      const motivationText = document.getElementById("motivationText");
+      const patternList = document.getElementById("patternList");
+      const actionList = document.getElementById("actionList");
+      const crisisBox = document.getElementById("crisisBox");
+      const normalResults = document.getElementById("normalResults");
+
+      scoreNumber.textContent = score;
+      levelTitle.textContent = level.title;
+      levelTitle.style.color = level.color;
+      levelDescription.textContent = level.description;
+
+      scoreRing.style.setProperty(
+        "--score-degree",
+        `${(score / 32) * 360}deg`
+      );
+
+      scoreRing.style.background = `
+        conic-gradient(
+          ${level.color} ${(score / 32) * 360}deg,
+          rgba(255, 255, 255, 0.12) ${(score / 32) * 360}deg
+        )
+      `;
+
+      const lines = motivationLines[level.type];
+      motivationText.textContent = lines[score % lines.length];
+
+      patternList.innerHTML = "";
+
+      topPatterns.forEach((pattern) => {
+        const item = document.createElement("li");
+        item.textContent =
+          `${pattern.label}: ${pattern.advice}`;
+        patternList.appendChild(item);
+      });
+
+      const actions = getBaseActions(score);
+
+      topPatterns.forEach((pattern) => {
+        if (pattern.value >= 3 && !actions.includes(pattern.advice)) {
+          actions.push(pattern.advice);
+        }
+      });
+
+      actionList.innerHTML = "";
+
+      actions.slice(0, 5).forEach((action) => {
+        const item = document.createElement("li");
+        item.textContent = action;
+        actionList.appendChild(item);
+      });
+
+      renderVideos(topPatterns);
+
+      if (safetyAnswer === "yes") {
+        crisisBox.style.display = "block";
+        normalResults.style.display = "none";
+      } else {
+        crisisBox.style.display = "none";
+        normalResults.style.display = "block";
+      }
+
+      showScreen(screens.results);
+      createConfetti();
+    }
+
+    startButton.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = new Array(questions.length).fill(null);
+      safetyAnswer = null;
+      renderQuestion();
+      showScreen(screens.quiz);
+    });
+
+    previousButton.addEventListener("click", () => {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (answers[currentQuestion] === null) return;
+
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+      } else {
+        showScreen(screens.safety);
+      }
+    });
+
+    safetyBackButton.addEventListener("click", () => {
+      showScreen(screens.quiz);
+    });
+
+    document.querySelectorAll('input[name="safety"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        safetyAnswer = input.value;
+        seeResultsButton.disabled = false;
+      });
+    });
+
+    seeResultsButton.addEventListener("click", () => {
+      displayResults();
+    });
+
+    restartButton.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = new Array(questions.length).fill(null);
+      safetyAnswer = null;
+
+      document.querySelectorAll('input[name="safety"]').forEach((input) => {
+        input.checked = false;
+      });
+
+      seeResultsButton.disabled = true;
+      showScreen(screens.welcome);
+    });
+  </script>
+</body>
+</html>
